@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #fce4ec, #e0f7fa);
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  }
+
+  h2 {
+    font-weight: 700;
+    color: #6a1b9a;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+  }
+
+  .card-title {
+    font-weight: 600;
+    color: #3949ab;
+  }
+
+  .list-group {
+    border: none;
+    margin-top: 10px;
+  }
+
+  .list-group-item {
+    border: none;
+    background: transparent;
+    padding-left: 0;
+    color: #333;
+  }
+
+  p {
+    margin-bottom: 6px;
+    color: #444;
+  }
+
+  .badge {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .bg-completed {
+    background-color: #4caf50 !important;
+    color: white;
+  }
+
+  .bg-pending {
+    background-color: #ffeb3b !important;
+    color: black;
+  }
+
+  .bg-accepted {
+    background-color: #f9a825 !important;
+    color: white;
+  }
+
+  .bg-rejected {
+    background-color: #c62828 !important;
+    color: white;
+  }
+
+  .btn-outline-primary {
+    border-color: #ba68c8;
+    color: #ba68c8;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: #ba68c8;
+    color: white;
+  }
+
+  .btn-outline-danger {
+    border-color: #e53935;
+    color: #e53935;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #e53935;
+    color: white;
+  }
+
+  small {
+    color: #888;
+  }
+
+  .alert-info {
+    background: rgba(179, 229, 252, 0.3);
+    color: #0277bd;
+    border-radius: 10px;
+  }
+</style>
+
+<div class="container mt-5 mb-5">
+  <h2 class="mb-4">Your Orders</h2>
+
+  {% for order in orders %}
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Order #{{ order.id }}</h5>
+        <p><strong>Date:</strong> {{ order.order_date|date:"F d, Y H:i" }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Payment Mode:</strong> {{ order.payment_mode }}</p>
+        <p><strong>Total Amount:</strong> ₹{{ order.get_total }}</p>
+        <p><strong>Delivery Status:</strong>
+          <span class="badge 
+            {% if order.delivery_status == 'completed' %}bg-completed
+            {% elif order.delivery_status == 'pending' %}bg-pending
+            {% elif order.delivery_status == 'accepted' %}bg-accepted
+            {% elif order.delivery_status == 'rejected' %}bg-rejected
+            {% else %}bg-secondary{% endif %}">
+            {{ order.get_delivery_status_display }}
+          </span>
+        </p>
+
+        {% if order.delivery_status == 'pending' %}
+          <form method="post" action="{% url 'delete_order' order.id %}" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger mb-3">Cancel Order</button>
+          </form>
+        {% endif %}
+
+        <h6 class="mt-4 mb-2 text-muted">Items:</h6>
+        <ul class="list-group">
+          {% for item in order.items.all %}
+            <li class="list-group-item">
+              <div>
+                <strong>Product:</strong> {{ item.product.name }}<br>
+                <small>Quantity: {{ item.quantity }}</small><br>
+                <small>Price per item: ₹{{ item.price }}</small><br>
+                <small>Total: ₹{{ item.get_total }}</small><br>
+
+                {% if order.delivery_status == "completed" %}
+                  {% if item.product.id not in reviewed_product_ids %}
+                    <a href="{% url 'add_review' item.product.id %}" class="btn btn-sm btn-outline-primary mt-1">Write Review</a>
+                  {% else %}
+                    <small>You already reviewed this product.</small>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info">You haven't placed any orders yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}

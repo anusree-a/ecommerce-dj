@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}E-Store{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #fdf7fa;
+      }
+
+      .navbar-gradient {
+        background: linear-gradient(90deg, #e91e63, #2196f3);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .navbar a.navbar-brand,
+      .navbar .nav-link {
+        color: white !important;
+        font-weight: 500;
+      }
+
+      .navbar .nav-link:hover {
+        text-decoration: underline;
+      }
+
+      .footer-gradient {
+        background: linear-gradient(90deg, #e91e63, #2196f3);
+        color: #ffffff;
+      }
+
+      .footer-gradient a {
+        color: #ffffff !important;
+      }
+
+      /* === DARK MODE === */
+      body.dark-mode {
+        background-color: #121212;
+        color: #e0e0e0;
+      }
+
+      .dark-mode .navbar-gradient,
+      .dark-mode .footer-gradient {
+        background: linear-gradient(90deg, #000428, #004e92);
+      }
+
+      .dark-mode .navbar .nav-link,
+      .dark-mode .navbar .navbar-brand,
+      .dark-mode .form-check-label,
+      .dark-mode .dropdown-toggle {
+        color: #ffffff !important;
+      }
+
+      .dark-mode .dropdown-menu {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+      }
+
+      .dark-mode .dropdown-item {
+        color: #e0e0e0;
+      }
+
+      .dark-mode .dropdown-item:hover {
+        background-color: #2e2e2e;
+      }
+
+      .dark-mode h1, .dark-mode h2, .dark-mode h3,
+      .dark-mode h4, .dark-mode h5, .dark-mode h6,
+      .dark-mode p, .dark-mode span, .dark-mode a,
+      .dark-mode li, .dark-mode label,
+      .dark-mode td, .dark-mode th {
+        color: #e0e0e0 !important;
+      }
+
+      .dark-mode a {
+        color: #8ab4f8 !important;
+      }
+
+      .dark-mode a:hover {
+        color: #b3d4ff !important;
+      }
+
+      .dark-mode .card,
+      .dark-mode .modal-content,
+      .dark-mode .form-control,
+      .dark-mode .form-select,
+      .dark-mode input,
+      .dark-mode textarea,
+      .dark-mode select {
+        background-color: #1e1e1e !important;
+        color: #f0f0f0 !important;
+        border: 1px solid #333 !important;
+      }
+
+      .dark-mode .btn {
+        color: #fff !important;
+      }
+
+      .dark-mode .btn-primary {
+        background-color: #2962ff;
+        border-color: #2962ff;
+      }
+
+      .dark-mode .btn-primary:hover {
+        background-color: #0039cb;
+        border-color: #0039cb;
+      }
+
+      .dark-mode .btn-outline-primary {
+        color: #8ab4f8;
+        border-color: #8ab4f8;
+      }
+
+      .dark-mode .btn-outline-primary:hover {
+        background-color: #8ab4f8;
+        color: #000;
+      }
+
+      .dark-mode table {
+        background-color: #1e1e1e;
+      }
+
+      .dark-mode table thead {
+        background-color: #2a2a2a;
+      }
+
+      .dark-mode table tbody tr {
+        border-color: #444;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-gradient px-4">
+      <a class="navbar-brand" href="{% url 'home' %}">E-store</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLinks">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navLinks">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item d-flex align-items-center">
+            <div class="form-check form-switch text-white ms-3">
+              <label class="form-check-label" for="darkModeToggle">🌚</label>
+              <input class="form-check-input" type="checkbox" id="darkModeToggle" />
+            </div>
+          </li>
+
+          <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'store' %}">Store</a></li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'cart' %}">
+              <i class="fas fa-shopping-cart"></i> Cart
+              <span class="badge bg-danger">{{ cart_count }}</span>
+            </a>
+          </li>
+
+          {% if user.is_authenticated %}
+            {% if user.userprofile.is_seller %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'seller_dashboard' %}">Seller Dashboard</a></li>
+            {% endif %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'seller_logout' %}">Logout</a></li>
+          {% else %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown">
+                Sign In
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="loginDropdown">
+                <li><a class="dropdown-item" href="{% url 'buyer_signup' %}">Buyer Login</a></li>
+                <li><a class="dropdown-item" href="{% url 'login' %}">Seller Login</a></li>
+                <li><a class="dropdown-item" href="{% url 'delivery_login' %}">Delivery Boy Login</a></li>
+              </ul>
+            </li>
+          {% endif %}
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="accountMenu" role="button" data-bs-toggle="dropdown">
+              Account
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="accountMenu">
+              {% if request.user.is_authenticated %}
+                {% if request.user.userprofile.is_seller %}
+                  <li><a class="dropdown-item" href="{% url 'seller_orders' %}">Seller Orders</a></li>
+                {% else %}
+                  <li><a class="dropdown-item" href="{% url 'orders' %}">My Orders</a></li>
+                {% endif %}
+                <li><a class="dropdown-item" href="{% url 'wishlist' %}">Wishlist</a></li>
+                <li><a class="dropdown-item" href="{% url 'cart' %}">Cart</a></li>
+                <li><a class="dropdown-item" href="{% url 'help_center' %}">Help Center</a></li>
+              {% else %}
+                <li><span class="dropdown-item text-muted">Login required</span></li>
+              {% endif %}
+            </ul>
+          </li>
+
+          {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Content Block -->
+    <main class="flex-fill">{% block content %}{% endblock %}</main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const toggle = document.getElementById('darkModeToggle');
+      const body = document.body;
+
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark-mode');
+        toggle.checked = true;
+      }
+
+      toggle.addEventListener('change', () => {
+        if (toggle.checked) {
+          body.classList.add('dark-mode');
+          localStorage.setItem('darkMode', 'enabled');
+        } else {
+          body.classList.remove('dark-mode');
+          localStorage.setItem('darkMode', 'disabled');
+        }
+      });
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer-gradient text-light pt-5 pb-4 mt-5 border-top">
+      <div class="container text-center text-md-start">
+        <div class="row text-center text-md-start">
+          <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
+            <h5 class="text-uppercase mb-4 fw-bold">E-Store</h5>
+            <p>Quality products at your fingertips. Shop now for the best deals!</p>
+          </div>
+
+          <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+            <h6 class="text-uppercase mb-4 fw-bold">Quick Links</h6>
+            <p><a href="{% url 'home' %}" class="text-decoration-none">Home</a></p>
+            <p><a href="{% url 'cart' %}" class="text-decoration-none">Cart</a></p>
+            <p><a href="{% url 'account' %}" class="text-decoration-none">My Account</a></p>
+            <p><a href="{% url 'wishlist' %}" class="text-decoration-none">Wishlist</a></p>
+          </div>
+
+          <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
+            <h6 class="text-uppercase mb-4 fw-bold">Help</h6>
+            <p><a href="#" class="text-decoration-none">FAQs</a></p>
+            <p><a href="#" class="text-decoration-none">Shipping</a></p>
+            <p><a href="#" class="text-decoration-none">Returns</a></p>
+            <p><a href="#" class="text-decoration-none">Privacy Policy</a></p>
+          </div>
+
+          <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+            <h6 class="text-uppercase mb-4 fw-bold">Contact</h6>
+            <p><i class="fas fa-home me-3"></i> India, Kerala 682001</p>
+            <p><i class="fas fa-envelope me-3"></i> support@E-store.com</p>
+            <p><i class="fas fa-phone me-3"></i> +91 9876543210</p>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-md-12 text-center">
+            <p class="mb-0">&copy; 2025 E-Store. All Rights Reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right top, #fce4ec, #e3f2fd);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    color: #333;
+  }
+
+  .hero-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 70px;
+    margin-bottom: 60px;
+  }
+
+  .hero-banner {
+    background: linear-gradient(135deg, #6262e4, #f943aa);
+    color: #fff;
+    padding: 100px 20px;
+    width: 1300px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .hero-content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .hero-banner h1 {
+    font-size: 2.7rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .hero-banner p {
+    font-size: 1.1rem;
+    font-style: italic;
+    min-height: 30px;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .hero-banner .btn-explore {
+    margin-top: 25px;
+    background-color: white;
+    color: #e91e63;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 28px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .hero-banner .btn-explore:hover {
+    background-color: #be1f54;
+    color: #2196f3;
+  }
+
+  @media (max-width: 1024px) {
+    .hero-banner {
+      width: 95%;
+      height: auto;
+      padding: 60px 20px;
+    }
+
+    .hero-banner h1 {
+      font-size: 2.2rem;
+    }
+  }
+
+  .category-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #e91e63;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 300px;
+    margin: auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s;
+    border: none;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-img-top {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .card-body {
+    background: linear-gradient(to right, #fce4ec, #e3f2fd);
+    padding: 1.2rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    color: #3f51b5;
+    font-weight: 600;
+  }
+
+  .card-text {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 1rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #e91e63, #2196f3);
+    border: none;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    border-radius: 30px;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(to right, #2196f3, #e91e63);
+  }
+
+  .shop-section {
+    padding: 60px 0;
+  }
+</style>
+
+<!-- ✅ HERO BANNER -->
+<div class="hero-wrapper">
+  <section class="hero-banner">
+    <div class="hero-content">
+      <h1>Welcome to E-Store</h1>
+      <p id="fashion-quote">Fashion is the armor to survive the reality of everyday life.</p>
+      <button class="btn-explore" onclick="document.getElementById('categories').scrollIntoView({ behavior: 'smooth' })">
+        Explore Categories ↓
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- ✅ CATEGORY SECTION -->
+<div id="categories" class="container shop-section">
+  <h2 class="text-center mb-5 category-title">Shop by Category</h2>
+  <div class="row justify-content-center g-4">
+
+    <!-- Dresses -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card h-100 text-center">
+        <img src="{% static 'images/dresses.png' %}" class="card-img-top" alt="Dresses">
+        <div class="card-body">
+          <h5 class="card-title">Dresses</h5>
+          <p class="card-text">Find elegant and trendy dresses for all occasions.</p>
+          <a href="{% url 'store' %}?category=dress" class="btn btn-primary">Explore</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shoes -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card h-100 text-center">
+        <img src="{% static 'images/shoes.png' %}" class="card-img-top" alt="Shoes">
+        <div class="card-body">
+          <h5 class="card-title">Shoes</h5>
+          <p class="card-text">Step into comfort and style with our curated shoe collection.</p>
+          <a href="{% url 'store' %}?category=shoes" class="btn btn-primary">Explore</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accessories -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card h-100 text-center">
+        <img src="{% static 'images/accessories.png' %}" class="card-img-top" alt="Accessories">
+        <div class="card-body">
+          <h5 class="card-title">Accessories</h5>
+          <p class="card-text">Complete your look with stylish accessories and more.</p>
+          <a href="{% url 'store' %}?category=accessories" class="btn btn-primary">Explore</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skincare -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card h-100 text-center">
+        <img src="{% static 'images/skincare.png' %}" class="card-img-top" alt="Skincare">
+        <div class="card-body">
+          <h5 class="card-title">Skincare</h5>
+          <p class="card-text">Nourish your skin with our top-rated skincare essentials.</p>
+          <a href="{% url 'store' %}?category=skincare" class="btn btn-primary">Explore</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Makeup -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card h-100 text-center">
+        <img src="{% static 'images/makeup.jpg' %}" class="card-img-top" alt="Makeup">
+        <div class="card-body">
+          <h5 class="card-title">Makeup</h5>
+          <p class="card-text">Explore the latest makeup trends and beauty tools.</p>
+          <a href="{% url 'store' %}?category=makeup" class="btn btn-primary">Explore</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jewellery -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card h-100 text-center">
+        <img src="{% static 'images/jewellery.png' %}" class="card-img-top" alt="Jewellery">
+        <div class="card-body">
+          <h5 class="card-title">Jewellery</h5>
+          <p class="card-text">Add sparkle to your style with our stunning jewellery collection.</p>
+          <a href="{% url 'store' %}?category=jewellery" class="btn btn-primary">Explore</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ✅ QUOTE ROTATOR SCRIPT -->
+<script>
+  const quotes = [
+    "Fashion is the armor to survive the reality of everyday life.",
+    "Style is a way to say who you are without speaking.",
+    "Life is short, make every outfit count.",
+    "Elegance is the only beauty that never fades.",
+    "Fashion fades, style is eternal."
+  ];
+
+  let index = 0;
+  const quoteEl = document.getElementById("fashion-quote");
+
+  setInterval(() => {
+    index = (index + 1) % quotes.length;
+    quoteEl.style.opacity = 0;
+    setTimeout(() => {
+      quoteEl.textContent = quotes[index];
+      quoteEl.style.opacity = 1;
+    }, 300);
+  }, 3000);
+</script>
+{% endblock %}

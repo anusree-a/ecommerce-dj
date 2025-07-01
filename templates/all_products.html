@@ -1,0 +1,232 @@
+{% load static %}
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right top, #fce4ec, #e3f2fd);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: #333;
+  }
+
+  .card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+    border: none;
+    background-color: #ffffffdd;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-img-top {
+    height: 230px;
+    object-fit: cover;
+  }
+
+  .card-title {
+    color: #3f51b5;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .card-text {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .price-current {
+    font-weight: bold;
+    color: #4caf50; /* green */
+  }
+
+  .price-old {
+    text-decoration: line-through;
+    color: #f44336; /* red */
+    font-size: 0.9rem;
+  }
+
+  .btn-primary, .btn-cart {
+    background: linear-gradient(to right, #e91e63, #2196f3);
+    border: none;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+  }
+
+  .btn-primary:hover, .btn-cart:hover {
+    background: linear-gradient(to right, #2196f3, #e91e63);
+  }
+
+  .btn-outline-primary {
+    border-radius: 30px;
+    font-size: 0.8rem;
+  }
+
+  .wishlist-btn {
+    font-size: 1.3rem;
+  }
+
+  .modal-content {
+    border-radius: 15px;
+    background: linear-gradient(to right, #fce4ec, #e3f2fd);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-heading {
+    color: #e91e63;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+  }
+
+  .star-rating {
+    color: gold;
+    font-size: 1rem;
+  }
+
+  .input-group input {
+    border-radius: 20px 0 0 20px;
+  }
+
+  .input-group .btn {
+    border-radius: 0 20px 20px 0;
+  }
+</style>
+
+<div class="container my-5">
+  {% if request.user.is_authenticated %}
+    <h4 class="mb-4 text-start text-primary">Hi {{ request.user.username }}</h4>
+  {% endif %}
+
+  <form method="GET" class="row g-3 align-items-center mb-4">
+    <div class="col-md-5">
+      <input type="text" name="q" class="form-control" placeholder="Search products..." value="{{ query }}">
+    </div>
+    <div class="col-md-4">
+      <select name="sort" class="form-select" onchange="this.form.submit()">
+        <option value="">-- Sort By --</option>
+        <option value="low_to_high" {% if sort_by == 'low_to_high' %}selected{% endif %}>Price: Low to High</option>
+        <option value="high_to_low" {% if sort_by == 'high_to_low' %}selected{% endif %}>Price: High to Low</option>
+        <option value="latest" {% if sort_by == 'latest' %}selected{% endif %}>Latest</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+  </form>
+
+  {% for cat_name, products in categories.items %}
+    {% if products %}
+      <h2 class="category-heading">{{ cat_name }}</h2>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5">
+        {% for product in products %}
+          <div class="col d-flex">
+            <div class="card w-100">
+              {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+              {% endif %}
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.description|truncatechars:80 }}</p>
+
+                {% if product.discount %}
+                  <p class="price-current">₹{{ product.get_discounted_price }}</p>
+                  <p class="price-old">₹{{ product.price }}</p>
+                  <span class="badge bg-success">{{ product.discount }}% OFF</span>
+                {% else %}
+                  <p class="price-current">₹{{ product.price }}</p>
+                {% endif %}
+
+                {% if product.avg_rating %}
+                  <div class="star-rating mb-1">
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= product.avg_rating %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                    <small class="text-muted">({{ product.reviews.count }} reviews)</small>
+                  </div>
+                {% else %}
+                  <div class="mb-1 text-muted"><small>No ratings yet</small></div>
+                {% endif %}
+
+                <div class="mt-2 d-flex gap-2">
+                  <a href="{% url 'product_reviews' product.id %}" class="btn btn-sm btn-outline-secondary">Reviews</a>
+                  <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#productModal{{ product.id }}">View</button>
+                </div>
+
+                <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                  {% csrf_token %}
+                  <div class="input-group mt-2 mb-2">
+                    <input type="number" name="count" value="1" min="1" max="{{ product.quantity }}" class="form-control">
+                    <button type="submit" class="btn btn-cart btn-small">Add</button>
+                  </div>
+                </form>
+
+                <div class="mt-auto text-end">
+                  <a href="{% url 'toggle_wishlist' product.id %}" class="wishlist-btn">
+                    {% if product.id in user_wishlist %}
+                      ❤️
+                    {% else %}
+                      🤍
+                    {% endif %}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal -->
+          <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="productModalLabel{{ product.id }}">{{ product.name }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex flex-column flex-md-row gap-4">
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded" style="max-width: 300px;" />
+                  <div>
+                    <p>{{ product.description }}</p>
+                    {% if product.discount %}
+                      <p class="price-current">₹{{ product.get_discounted_price }}</p>
+                      <p class="price-old">₹{{ product.price }}</p>
+                      <span class="badge bg-success">{{ product.discount }}% OFF</span>
+                    {% else %}
+                      <p class="price-current">₹{{ product.price }}</p>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'add_to_cart' product.id %}" class="mt-3">
+                      {% csrf_token %}
+                      <div class="input-group">
+                        <input type="number" name="count" value="1" min="1" max="{{ product.quantity }}" class="form-control" />
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                      </div>
+                    </form>
+
+                    <div class="mt-3">
+                      <a href="{% url 'toggle_wishlist' product.id %}" class="btn btn-outline-danger">
+                        {% if product.id in user_wishlist %}❤️ Remove from Wishlist{% else %}🤍 Add to Wishlist{% endif %}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% endfor %}
+      </div>
+    {% else %}
+      {% if query %}
+        <p class="text-muted">No products found for "{{ query }}".</p>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+</div>

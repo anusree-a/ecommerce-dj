@@ -1,0 +1,35 @@
+
+{% extends 'base.html' %}
+
+{% block title %}SellerLogin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h3 class="mb-4">Seller Login</h3>
+       
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+            
+            <!-- Hidden fake fields to prevent browser autofill -->
+            <input type="text" name="fakeusernameremembered" style="display:none">
+            <input type="password" name="fakepasswordremembered" style="display:none">
+
+            <div class="form-group mb-3">
+                <label>Username</label>
+                <input type="text" name="username" class="form-control" autocomplete="new-username" required>
+            </div>
+            <div class="form-group mb-3">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" autocomplete="new-password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+            <p class="mt-2 text-center">
+  <a href="{% url 'password_reset' %}">Forgot Password?</a>
+</p>
+        </form>
+
+        
+    </div>
+</div>
+{% endblock %}

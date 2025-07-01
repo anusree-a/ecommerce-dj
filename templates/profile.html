@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #fce4ec, #e0f7fa);
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  }
+
+  .profile-container {
+    background: linear-gradient(135deg, #fce4ec, #e0f7fa);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 900px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+  }
+
+  h2, h4 {
+    font-weight: 700;
+    color: #6a1b9a;
+  }
+
+  .btn-tile {
+    width: 180px;
+    height: 80px;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.15);
+  }
+
+  .btn-tile-primary {
+    background: linear-gradient(to right, #ba68c8, #4fc3f7);
+    color: white;
+    border: none;
+  }
+
+  .btn-tile-primary:hover {
+    background: linear-gradient(to right, #9575cd, #4fc3f7);
+  }
+
+  .btn-outline-secondary {
+    border-radius: 16px;
+    font-weight: 600;
+  }
+
+  .section-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+  }
+
+  .alert-info {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  label {
+    font-weight: 600;
+    color: #6a1b9a;
+  }
+
+  .form-control:focus {
+    border-color: #ba68c8;
+    box-shadow: 0 0 0 0.15rem rgba(186, 104, 200, 0.25);
+  }
+</style>
+
+<div class="container d-flex justify-content-center">
+  <div class="profile-container">
+
+    <h2 class="text-center mb-4">My Profile</h2>
+    <p class="text-center text-danger">ROLE: {{ role }}</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success text-center">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Top Options -->
+    {% if role == 'buyer' %}
+    <div class="text-center mb-5">
+      <h4 class="mb-3">Quick Options</h4>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'orders' %}" class="btn btn-tile btn-tile-primary">My Orders</a>
+        <a href="{% url 'wishlist' %}" class="btn btn-tile btn-outline-secondary">Wishlist</a>
+        <a href="{% url 'password_reset' %}" class="btn btn-tile btn-warning text-white">Change Password</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Personal Details -->
+    <div class="section-card mx-auto" style="max-width: 600px;">
+      <h4 class="mb-3">Personal Details</h4>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Name</label>
+          <input type="text" name="name" value="{{ name }}" class="form-control shadow-sm" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" value="{{ email }}" class="form-control shadow-sm" required>
+        </div>
+        <button type="submit" class="btn btn-success mt-2">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- Buyer-only sections -->
+    {% if role == 'buyer' %}
+    <div class="section-card mx-auto" style="max-width: 600px;">
+      <h4 class="mb-3 text-primary">Saved Addresses</h4>
+      <ul class="list-group mb-4">
+        {% for addr in addresses %}
+          <li class="list-group-item">
+            <form method="POST" class="d-flex flex-column flex-sm-row gap-2">
+              {% csrf_token %}
+              <input type="hidden" name="edit_address_id" value="{{ addr.id }}">
+              <textarea name="address" rows="2" class="form-control" required>{{ addr.address }}</textarea>
+              <button type="submit" name="update_address" class="btn btn-success btn-sm">Save</button>
+            </form>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No address saved yet.</li>
+        {% endfor %}
+      </ul>
+
+      <h5 class="text-primary text-center">Add New Address</h5>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">{{ address_form.address }}</div>
+        <div class="text-center">
+          <button type="submit" name="save_address" class="btn btn-outline-primary">Add Address</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Coins section -->
+    <div class="alert alert-info text-center mx-auto" style="max-width: 600px;">
+      <strong>Your Coins:</strong> {{ coin_balance }}<br>
+      {% if coin_balance >= 100 %}
+        🎉 You are eligible for 10% discount on your next purchase!
+      {% else %}
+        💡 Earn {{ coins_needed }} more coins to unlock 10% discount.
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Seller Section -->
+    {% if role == 'seller' %}
+    <div class="section-card mx-auto" style="max-width: 600px;">
+      <h4 class="mb-3 text-primary">Sales Data</h4>
+      <ul class="list-group">
+        {% for name, qty in sales_data %}
+          <li class="list-group-item d-flex justify-content-between">
+            {{ name }} <span>Sold: {{ qty }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="text-center mt-3">
+        <a href="{% url 'seller_orders' %}" class="btn btn-primary">View Orders</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Delivery Section -->
+    {% if role == 'delivery' %}
+    <p class="text-center"><strong>Phone:</strong> {{ phone }}</p>
+
+    <div class="section-card">
+      <h4 class="mb-3 text-primary">Pending Orders</h4>
+      <ul class="list-group mb-3">
+        {% for order in pending_orders %}
+          <li class="list-group-item">
+            <strong>Order #{{ order.id }}</strong> - ₹{{ order.get_total }}<br>
+            <small>Status: Pending | Placed on {{ order.order_date|date:"Y-m-d" }}</small>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No pending orders.</li>
+        {% endfor %}
+      </ul>
+
+      <h4 class="mb-3 text-primary">Accepted Orders</h4>
+      <ul class="list-group mb-3">
+        {% for order in accepted_orders %}
+          <li class="list-group-item">
+            <strong>Order #{{ order.id }}</strong> - ₹{{ order.get_total }}<br>
+            <small>Status: Accepted | Accepted on {{ order.order_date|date:"Y-m-d" }}</small>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No accepted orders.</li>
+        {% endfor %}
+      </ul>
+
+      <h4 class="mb-3 text-primary">Completed Deliveries</h4>
+      <ul class="list-group">
+        {% for order in completed_orders %}
+          <li class="list-group-item">
+            <strong>Order #{{ order.id }}</strong> - ₹{{ order.get_total }}<br>
+            <small>Completed on: {{ order.order_date|date:"Y-m-d" }}</small>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No completed deliveries yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

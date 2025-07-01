@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #fce4ec, #e0f7fa);
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  }
+
+  .confirmation-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+
+  h2 {
+    font-weight: 700;
+    color: #6a1b9a;
+    margin-bottom: 20px;
+  }
+
+  .summary {
+    text-align: left;
+    margin-top: 20px;
+    color: #333;
+  }
+
+  .summary p {
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+  }
+
+  .btn-primary {
+    margin-top: 25px;
+    background: linear-gradient(to right, #ba68c8, #9575cd);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(to right, #9575cd, #ba68c8);
+  }
+</style>
+
+<div class="container mt-5 mb-5">
+  <div class="confirmation-card">
+    <h2>🎉 Order Placed Successfully!</h2>
+
+    <div class="summary text-start">
+      <p><strong>Order ID:</strong> {{ order.id }}</p>
+      <p><strong>Address:</strong> {{ order.address }}</p>
+      <p><strong>Payment Mode:</strong> {{ order.payment_mode }}</p>
+      <p><strong>Redeemed Coins:</strong> {{ coins_used }}</p>
+      <p><strong>Discount Applied:</strong> ₹{{ redeem_value }}</p>
+      <p><strong>Final Amount Paid:</strong> ₹{{ final_amount }}</p>
+      <p><strong>Coins Earned:</strong> {{ coins_earned }}</p>
+    </div>
+
+    <a href="{% url 'orders' %}" class="btn btn-primary">View My Orders</a>
+  </div>
+</div>
+{% endblock %}

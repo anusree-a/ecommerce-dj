@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #fce4ec, #e0f7fa);
+  }
+
+  .checkout-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(5px);
+  }
+
+  h2, h4 {
+    color: #5e4b8b;
+    font-weight: 700;
+  }
+
+  label {
+    color: #6a1b9a;
+    font-weight: 600;
+  }
+
+  .form-control:focus {
+    border-color: #ba68c8;
+    box-shadow: 0 0 0 0.15rem rgba(186, 104, 200, 0.25);
+  }
+
+  .table thead th {
+    background-color: #f8bbd0;
+    color: #4a148c;
+    border: none;
+  }
+
+  .table-bordered td, .table-bordered th {
+    border: 1px solid #f3e5f5;
+  }
+
+  .btn-success {
+    background: linear-gradient(to right, #f48fb1, #ce93d8);
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 10px 25px;
+    box-shadow: 0 4px 12px rgba(186, 104, 200, 0.3);
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(to right, #81d4fa, #b39ddb);
+  }
+
+  .text-success {
+    color: #43a047 !important;
+  }
+
+  .text-danger {
+    color: #e53935 !important;
+  }
+
+  .text-muted {
+    color: #7e57c2 !important;
+    font-style: italic;
+  }
+</style>
+
+<div class="container mt-5">
+  <h2>Checkout</h2>
+  <hr />
+
+  <div class="row">
+    <!-- Cart Items -->
+    <div class="col-md-7 mb-4">
+      <div class="checkout-card">
+        <h4>Your Cart</h4>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart_items %}
+            <tr>
+              <td>{{ item.product.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>₹{{ item.product.get_discounted_price }}</td>
+              <td>₹{{ item.get_total_price }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Summary and Form -->
+    <div class="col-md-5">
+      <div class="checkout-card">
+        <h4>Order Summary</h4>
+        <p><strong>Cart Total:</strong> ₹{{ cart_total }}</p>
+        <p><strong>Your Coins:</strong> {{ coins }}</p>
+
+        {% if eligible_for_discount %}
+        <p class="text-success">
+          <strong>✔ Eligible for 10% discount using 100 coins!</strong>
+        </p>
+        <p><strong>Using Coins:</strong> 100 (₹{{ redeem_value }} off)</p>
+        {% else %}
+        <p class="text-danger"><strong>✘ Not eligible for discount.</strong></p>
+        <p>Earn {{ coins_needed }} more coins to unlock 10% discount.</p>
+        {% endif %}
+
+        <p><strong>Final Payable Amount:</strong> ₹{{ final_amount }}</p>
+
+        <!-- Order Form -->
+        <form method="POST">
+          {% csrf_token %}
+
+          {% if addresses %}
+          <div class="form-group mt-3">
+            <label for="selected_address">Select Saved Address</label>
+            <select name="selected_address" id="selected_address" class="form-control">
+              <option value="">-- None (I will enter a new address) --</option>
+              {% for addr in addresses %}
+                <option value="{{ addr.address }}">{{ addr.address }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+
+          <hr />
+          <p class="text-muted">Or add a new address below:</p>
+
+          <div class="form-group mt-2">
+            <label for="address">New Address</label>
+            <textarea
+              name="address"
+              id="address"
+              class="form-control"
+              rows="3"
+              placeholder="Enter new address"
+            ></textarea>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="payment_mode">Payment Mode</label>
+            <select
+              name="payment_mode"
+              id="payment_mode"
+              class="form-control"
+              required
+            >
+              <option value="COD">Cash on Delivery</option>
+              <option value="GPay">Google Pay</option>
+              <option value="Paytm">Paytm</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-success mt-4" >Place Order</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

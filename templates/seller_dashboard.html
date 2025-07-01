@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Seller Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <!-- Add Product Form -->
+   <h2 class="text-center text-primary mb-4">Hi {{ request.user.username }}</h2>
+
+  <div class="row justify-content-center mb-5">
+    <div class="col-md-6">
+      <div class="card shadow border-0 rounded-4">
+        <div class="card-body">
+          <h3 class="mb-4 text-primary fw-bold text-center">Add New Product</h3>
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="id_name" class="form-label">Product Name</label>
+              <input type="text" name="name" class="form-control" id="id_name" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_price" class="form-label">Price</label>
+              <input type="number" name="price" class="form-control" id="id_price" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_quantity" class="form-label">Quantity</label>
+              <input type="number" name="quantity" class="form-control" id="id_quantity" required>
+            </div>
+
+            <!-- NEW CATEGORY DROPDOWN -->
+            <div class="mb-3">
+              <label for="id_category" class="form-label">Category</label>
+              <select name="category" class="form-select" id="id_category" required>
+                <option value="">-- Select Category --</option>
+                <option value="dress">Dresses</option>
+                <option value="skincare">Skin Care</option>
+                <option value="makeup">Makeup</option>
+                <option value="shoes">Shoes</option>
+                <option value="accessories">Accessories</option>
+                <option value="jewellery">Jewellery</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_image" class="form-label">Image</label>
+              <input type="file" name="image" class="form-control" id="id_image" required>
+            </div>
+              <div class="mb-3">
+            <label for="id_discount" class="form-label">Discount (%)</label>
+           <input type="number" name="discount" class="form-control" id="id_discount" min="0" max="100">
+          </div>
+
+
+
+            <div class="mb-3">
+              <label for="id_description" class="form-label">Description</label>
+              <textarea name="description" class="form-control" id="id_description" rows="3" required></textarea>
+            </div>
+
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-success px-4">Add to Store</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Products Section -->
+  <h3 class="text-center text-primary fw-bold mb-4">My Products</h3>
+  <div class="row gy-5 gx-4 justify-content-center">
+    {% for product in products %}
+    <div class="col-lg-3 col-md-4 col-sm-6">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+            <span class="text-muted">No image available</span>
+          </div>
+        {% endif %}
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title text-dark">{{ product.name }}</h5>
+          <p class="card-text text-muted flex-grow-1">{{ product.description|truncatechars:100 }}</p>
+          <ul class="list-group list-group-flush mb-3">
+           <li class="list-group-item">
+  <strong>Price:</strong>
+  {% if product.discount %}
+    <span class="text-danger">₹{{ product.get_discounted_price }}</span>
+    <span class="text-muted" style="text-decoration: line-through;">₹{{ product.price }}</span>
+    <span class="badge bg-success">{{ product.discount }}% OFF</span>
+  {% else %}
+    ₹{{ product.price }}
+  {% endif %}
+</li>
+
+            <li class="list-group-item"><strong>Available:</strong> {{ product.quantity }}</li>
+            <li class="list-group-item"><strong>Category:</strong> {{ product.get_category_display }}</li>
+          </ul>
+          <div class="d-flex gap-2">
+            <a href="{% url 'edit_product' product.id %}" class="btn btn-outline-warning w-50">Edit</a>
+            <a href="{% url 'delete_product' product.id %}" class="btn btn-outline-danger w-50">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center">
+      <p class="text-muted">No products added yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

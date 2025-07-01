@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Reviews for {{ product.name }}</h2>
+  {% if reviews %}
+    <div class="list-group">
+      {% for review in reviews %}
+        <div class="list-group-item mb-3">
+          <p><strong>{{ review.user.username }}</strong> <small class="text-muted">{{ review.created_at|date:"F d, Y H:i" }}</small></p>
+          <p>{{ review.content }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No reviews yet for this product.</p>
+  {% endif %}
+  <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Products</a>
+</div>
+{% endblock %}

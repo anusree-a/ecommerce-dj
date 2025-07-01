@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-primary mb-4">Orders with Your Products</h2>
+
+  {% for order in orders %}
+    <div class="card mb-3 shadow">
+      <div class="card-body">
+        <h5 class="card-title">Order #{{ order.id }} by {{ order.user.username }}</h5>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Payment:</strong> {{ order.payment_mode }}</p>
+        <p><strong>Date:</strong> {{ order.order_date|date:"F d, Y H:i" }}</p>
+        <p><strong>Delivery Status:</strong> 
+          <span class="badge 
+            {% if order.delivery_status == 'completed' %}bg-success
+            {% elif order.delivery_status == 'accepted' %}bg-warning
+            {% else %}bg-secondary{% endif %}">
+            {{ order.get_delivery_status_display }}
+          </span>
+        </p>
+
+        <h6 class="mt-3">Your Items in this Order:</h6>
+        <ul class="list-group">
+          {% for item in order.items.all %}
+            {% if item.product.seller == request.user %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ item.product.name }} (x{{ item.quantity }})
+                <span>₹{{ item.get_total }}</span>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info">No orders found that include your products.</div>
+  {% endfor %}
+</div>
+{% endblock %}

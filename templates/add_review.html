@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Add Review for {{ product.name }}</h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label class="form-label"><strong>Your Rating:</strong></label>
+      <div class="rating-stars d-flex flex-row-reverse justify-content-start">
+        {% for i in "54321" %}
+          <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" required>
+          <label for="star{{ i }}" title="{{ i }} stars">★</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="mb-3">
+      {{ form.content.label_tag }}
+      {{ form.content }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+  </form>
+</div>
+
+<style>
+  .rating-stars {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+  }
+
+  .rating-stars input[type="radio"] {
+    display: none;
+  }
+
+  .rating-stars label {
+    font-size: 2rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .rating-stars input[type="radio"]:checked ~ label,
+  .rating-stars label:hover,
+  .rating-stars label:hover ~ label {
+    color: #f5b301;
+  }
+</style>
+{% endblock %}
